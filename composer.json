@@ -63,6 +63,7 @@
         "test": "phpunit",
         "test-coverage": "phpunit --coverage-html coverage",
         "analyse": "phpstan analyse src --no-progress --memory-limit=1G",
+        "phpstan": "phpstan analyse src --no-progress --memory-limit=1G",
         "cs-check": "phpcs src --standard=PSR12",
         "cs-fix": "phpcbf src --standard=PSR12",
         "quality": [
