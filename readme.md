@@ -304,7 +304,7 @@ $router->get('/users/{id}/posts/{slug}', function($id, $slug) {
 
 ```php
 $router->get('/current-route', function() {
-    $route = Router::get_current_route();
+    $route = Router::getCurrentRoute();
     return json_encode([
         'method' => $route->method,
         'path' => $route->path,
