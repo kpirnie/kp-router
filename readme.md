@@ -24,7 +24,124 @@ A comprehensive PHP routing library with middleware support, rate limiting, view
 Install via Composer:
 
 ```bash
-composer require kevinpirnie/kpt-router
+composer require kpirnie/kpt-router
+```
+
+## Web Server Configuration
+
+For the router to work properly, you need to configure your web server to redirect all requests to your main PHP file (usually `index.php`). Here are the configurations for popular web servers:
+
+### Apache (.htaccess)
+
+Create an `.htaccess` file in your document root:
+
+```apache
+RewriteEngine On
+
+# Handle Angular and other client-side routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Optional: Redirect trailing slashes
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# Security headers (optional)
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+```
+
+### Nginx
+
+Add this to your Nginx server block:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/your/app;
+    index index.php;
+
+    # Route all requests to index.php
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP handler
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock; # Adjust PHP version
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Security: Deny access to sensitive files
+    location ~ /\. {
+        deny all;
+    }
+    
+    location ~ /(vendor|tmp|cache)/ {
+        deny all;
+    }
+}
+```
+
+### IIS (web.config)
+
+For Windows IIS servers, create a `web.config` file:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="Main Rule" stopProcessing="true">
+                    <match url=".*" />
+                    <conditions logicalGrouping="MatchAll">
+                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                    </conditions>
+                    <action type="Rewrite" url="index.php" />
+                </rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>
+```
+
+### Built-in PHP Server (Development)
+
+For development, you can use PHP's built-in server:
+
+```bash
+# From your app directory
+php -S localhost:8000 -t . index.php
+```
+
+Or create a simple router file (`router.php`):
+
+```php
+<?php
+// router.php for PHP built-in server
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+// Serve static files directly
+if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+    return false;
+}
+
+// Route everything else to index.php
+require_once __DIR__ . '/index.php';
+```
+
+Then run:
+```bash
+php -S localhost:8000 router.php
 ```
 
 ## Basic Usage
@@ -44,7 +161,6 @@ The router expects this directory structure:
 ```
 your-app/
 ├── views/           # Templates (auto-detected as {appPath}/views)
-├── controllers/     # Controllers to be used
 ├── tmp/            # Cache and rate limiting data (auto-created)
 │   └── kpt_rate_limits/
 ├── vendor/         # Composer dependencies
@@ -304,7 +420,7 @@ $router->get('/users/{id}/posts/{slug}', function($id, $slug) {
 
 ```php
 $router->get('/current-route', function() {
-    $route = Router::getCurrentRoute();
+    $route = Router::get_current_route();
     return json_encode([
         'method' => $route->method,
         'path' => $route->path,
@@ -339,17 +455,12 @@ $cleanPath = Router::sanitizePath('/path//with///slashes/');
 
 ### Environment Setup
 
-The router expects certain constants and classes to be defined:
+The router expects certain constants to be defined:
 
 ```php
 // Optional: Define KPT_URI for Redis prefixing
 define('KPT_URI', 'myapp');
 ```
-
-### Required Packages
-
-- kevinpirnie/kpt-logger
-- kevinpirnie/kpt-cache
 
 ## Example Application
 
