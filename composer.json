@@ -1,5 +1,5 @@
 {
-    "name": "kevinpirnie/kpt-router",
+    "name": "kpirnie/kpt-router",
     "description": "A comprehensive PHP routing library with middleware support, rate limiting, view rendering, and controller resolution capabilities",
     "type": "library",
     "keywords": [
@@ -18,7 +18,7 @@
         "controllers",
         "caching"
     ],
-    "homepage": "https://github.com/kpirnie/kp-router",
+    "homepage": "https://github.com/kpirnie/kpt-router",
     "license": "MIT",
     "authors": [
         {
@@ -28,15 +28,19 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.0",
         "ext-pdo": "*",
         "kevinpirnie/kpt-logger": "^1.0",
         "kevinpirnie/kpt-cache": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0 || ^11.0",
-        "phpstan/phpstan": "^1.10",
-        "squizlabs/php_codesniffer": "^3.7"
+        "phpunit/phpunit": "^9.0|^10.0",
+        "phpstan/phpstan": "^1.0",
+        "squizlabs/php_codesniffer": "^3.6"
+    },
+    "suggest": {
+        "ext-redis": "Required for Redis-based rate limiting and caching",
+        "predis/predis": "Alternative Redis client if ext-redis is not available"
     },
     "autoload": {
         "psr-4": {
@@ -48,28 +52,41 @@
             "KPT\\Tests\\": "tests/"
         }
     },
-    "scripts": {
-        "test": "phpunit tests",
-        "test-coverage": "phpunit tests --coverage-html coverage --coverage-filter src",
-        "phpstan": "phpstan analyse src",
-        "cs-check": "phpcs src --standard=PSR12",
-        "cs-fix": "phpcbf src --standard=PSR12"
-    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "config": {
         "sort-packages": true,
         "optimize-autoloader": true,
         "preferred-install": "dist"
     },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "support": {
-        "issues": "https://github.com/kpirnie/kp-router/issues",
-        "source": "https://github.com/kpirnie/kp-router"
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "analyse": "phpstan analyse src --no-progress --memory-limit=1G",
+        "cs-check": "phpcs src --standard=PSR12",
+        "cs-fix": "phpcbf src --standard=PSR12",
+        "quality": [
+            "@cs-check",
+            "@analyse",
+            "@test"
+        ]
     },
-    "funding": [
-        {
-            "type": "github",
-            "url": "https://github.com/sponsors/kpirnie"
+    "scripts-descriptions": {
+        "test": "Run PHPUnit tests",
+        "test-coverage": "Run PHPUnit tests with coverage report",
+        "analyse": "Run PHPStan static analysis",
+        "cs-check": "Check coding standards compliance",
+        "cs-fix": "Fix coding standards violations",
+        "quality": "Run all quality checks"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "8.4.x-dev"
         }
-    ]
+    },
+    "support": {
+        "issues": "https://github.com/kpirnie/kpt-router/issues",
+        "source": "https://github.com/kpirnie/kpt-router",
+        "docs": "https://github.com/kpirnie/kpt-router/blob/main/README.md"
+    }
 }
