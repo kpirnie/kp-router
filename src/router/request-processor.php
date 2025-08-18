@@ -172,9 +172,17 @@ if (! trait_exists('RouterRequestProcessor')) {
         private function findRouteHandler(string $method, string $uri): ?array
         {
 
-            // clean up the URI
+            // clean up the URI - remove query string
             $uri = strtok($uri, '?');
-            $uri = rtrim($uri, '/') ?: '/';
+            
+            // Normalize the URI - ensure it starts with / and has no trailing slash (unless it's root)
+            $uri = '/' . trim($uri, '/');
+            if ($uri === '/') {
+                // Keep root as is
+            } else {
+                // Remove trailing slash for all other paths
+                $uri = rtrim($uri, '/');
+            }
 
             // log debug information
             Logger::debug("Route Match", [
@@ -191,6 +199,15 @@ if (! trait_exists('RouterRequestProcessor')) {
                 ];
             }
 
+            // Also try with trailing slash (for compatibility)
+            $uriWithSlash = $uri . '/';
+            if ($uri !== '/' && isset($this -> routes[$method][$uriWithSlash])) {
+                return [
+                    'callback' => $this -> routes[$method][$uriWithSlash],
+                    'params' => [ ]
+                ];
+            }
+
             // try pattern matching for dynamic routes
             foreach ($this -> routes[$method] ?? [ ] as $routePath => $callback) {
                 // convert route to regex pattern
@@ -203,8 +220,9 @@ if (! trait_exists('RouterRequestProcessor')) {
                     'testing_against' => $uri
                 ]);
 
-                // test pattern against URI
-                if (preg_match($pattern, $uri, $matches)) {
+                // test pattern against URI (with and without trailing slash)
+                if (preg_match($pattern, $uri, $matches) || 
+                    ($uri !== '/' && preg_match($pattern, $uriWithSlash, $matches))) {
                     // log successful match
                     Logger::debug("ROUTE MATCHED!", [
                         'route_path' => $routePath,
