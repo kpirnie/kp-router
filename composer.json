@@ -73,11 +73,6 @@
         "cs-fix": "Fix coding standards violations",
         "quality": "Run all quality checks"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-main": "8.4.x-dev"
-        }
-    },
     "support": {
         "issues": "https://github.com/kpirnie/kpt-router/issues",
         "source": "https://github.com/kpirnie/kpt-router",
