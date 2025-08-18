@@ -37,6 +37,7 @@ if( ! class_exists( 'Router' ) ) {
 
         /** @var string the routing base path */
         private string $basePath = '';
+        private string $appPath = '';
 
         /**
          * Constructor
@@ -46,11 +47,13 @@ if( ! class_exists( 'Router' ) ) {
          * 
          * @param string $basePath The base path for all routes
          */
-        public function __construct( string $basePath = '' ) {
+        public function __construct( string $basePath = '', string $appPath = '' ) {
 
             // set the base paths
             $this -> basePath = self::sanitizePath( $basePath );
-            $this -> viewsPath = defined('KPT_PATH') ? KPT_PATH . '/views' : '';
+            $this -> appPath = !empty($appPath) ? rtrim($appPath, '/') : getcwd();
+            $this -> viewsPath = $this -> appPath . '/views';
+            $this -> rateLimitPath = $this -> appPath . '/tmp/kpt_rate_limits';
 
             // if the file base rate limiter path doesnt exist, create it
             if ( ! file_exists( $this -> rateLimitPath ) ) {

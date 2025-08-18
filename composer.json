@@ -1,17 +1,24 @@
 {
-    "name": "kevinpirnie/kpt-database",
-    "description": "A modern, fluent PHP database wrapper built on top of PDO, providing an elegant and secure way to interact with MySQL databases",
+    "name": "kevinpirnie/kpt-router",
+    "description": "A comprehensive PHP routing library with middleware support, rate limiting, view rendering, and controller resolution capabilities",
     "type": "library",
     "keywords": [
-        "database",
-        "pdo",
-        "mysql",
-        "fluent",
-        "orm",
-        "sql",
-        "query-builder"
+        "php",
+        "router",
+        "routing",
+        "middleware",
+        "rate-limiting",
+        "mvc",
+        "framework",
+        "http",
+        "web",
+        "api",
+        "rest",
+        "views",
+        "controllers",
+        "caching"
     ],
-    "homepage": "https://github.com/kpirnie/kp-database",
+    "homepage": "https://github.com/kpirnie/kp-router",
     "license": "MIT",
     "authors": [
         {
@@ -23,7 +30,8 @@
     "require": {
         "php": ">=8.1",
         "ext-pdo": "*",
-        "kevinpirnie/kpt-logger": "^1.0"
+        "kevinpirnie/kpt-logger": "^1.0",
+        "kevinpirnie/kpt-cache": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0 || ^11.0",
@@ -55,8 +63,8 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "support": {
-        "issues": "https://github.com/kpirnie/kp-database/issues",
-        "source": "https://github.com/kpirnie/kp-database"
+        "issues": "https://github.com/kpirnie/kp-router/issues",
+        "source": "https://github.com/kpirnie/kp-router"
     },
     "funding": [
         {

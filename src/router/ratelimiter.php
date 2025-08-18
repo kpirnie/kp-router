@@ -38,7 +38,7 @@ if( ! trait_exists( 'Router_RateLimiter' ) ) {
         private ?\Redis $redis = null;
 
         // file storage path for rate limits
-        private string $rateLimitPath = '/tmp/kpt_rate_limits';
+        private string $rateLimitPath = '';
 
         // rate limiting enabled flag
         private bool $rateLimitingEnabled = false;
@@ -102,7 +102,7 @@ if( ! trait_exists( 'Router_RateLimiter' ) ) {
 
                 // configure redis settings
                 $this -> redis -> select( 1 );
-                $this -> redis -> setOption( \Redis::OPT_PREFIX, KPT_URI . '_RL:' );
+                $this -> redis -> setOption( \Redis::OPT_PREFIX, ( KPT_URI ?? 'kpt_router' ) . '_RL:' );
 
                 // authenticate if password provided
                 if ( ! empty( $config['password'] ) ) {
