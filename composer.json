@@ -29,7 +29,6 @@
     ],
     "require": {
         "php": ">=8.0",
-        "ext-pdo": "*",
         "kevinpirnie/kpt-logger": "^1.0",
         "kevinpirnie/kpt-cache": "^1.0"
     },
