@@ -2,18 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 
-// Mock the Logger and Cache classes to avoid dependencies
-class Logger {
-    public static function debug($msg, $ctx = []) {}
-    public static function error($msg, $ctx = []) {}
-}
-
-class Cache {
-    public static function get($key) { return false; }
-    public static function set($key, $val, $ttl = 3600) {}
-    public static function delete($key) {}
-}
-
 class SimpleRouterTest extends TestCase
 {
     public function testRouterCreation()
