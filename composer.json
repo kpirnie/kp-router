@@ -71,7 +71,6 @@
     "scripts-descriptions": {
         "test": "Run PHPUnit tests",
         "test-coverage": "Run PHPUnit tests with coverage report",
-        "analyse": "Run PHPStan static analysis",
         "cs-check": "Check coding standards compliance",
         "cs-fix": "Fix coding standards violations",
         "quality": "Run all quality checks"
