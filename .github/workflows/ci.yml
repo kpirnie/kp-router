@@ -12,7 +12,7 @@ jobs:
     
     strategy:
       matrix:
-        php-version: [8.1, 8.2, 8.3]
+        php-version: [8.2, 8.3, 8.4]
         dependencies: [lowest, highest]
     
     services:
@@ -63,7 +63,3 @@ jobs:
 
     - name: Run CodeSniffer
       run: composer run cs-check
-
-    - name: Upload coverage reports to Codecov
-      if: matrix.php-version == '8.2' && matrix.dependencies == 'highest'
-      uses: codecov/codecov-action@v3
