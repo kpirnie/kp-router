@@ -174,7 +174,7 @@ if (! trait_exists('RouterRequestProcessor')) {
 
             // clean up the URI - remove query string
             $uri = strtok($uri, '?');
-            
+
             // Normalize the URI - ensure it starts with / and has no trailing slash (unless it's root)
             $uri = '/' . trim($uri, '/');
             if ($uri === '/') {
@@ -221,8 +221,10 @@ if (! trait_exists('RouterRequestProcessor')) {
                 ]);
 
                 // test pattern against URI (with and without trailing slash)
-                if (preg_match($pattern, $uri, $matches) || 
-                    ($uri !== '/' && preg_match($pattern, $uriWithSlash, $matches))) {
+                if (
+                    preg_match($pattern, $uri, $matches) ||
+                    ($uri !== '/' && preg_match($pattern, $uriWithSlash, $matches))
+                ) {
                     // log successful match
                     Logger::debug("ROUTE MATCHED!", [
                         'route_path' => $routePath,
