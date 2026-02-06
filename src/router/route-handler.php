@@ -27,10 +27,10 @@ if (! trait_exists('RouterRouteHandler')) {
     trait RouterRouteHandler
     {
         // registered routes by HTTP method
-        private array $routes = [ ];
+        private array $routes = [];
 
         // middleware definitions registry
-        private array $middlewareDefinitions = [ ];
+        private array $middlewareDefinitions = [];
 
         /**
          * Register middleware definitions
@@ -48,7 +48,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // merge with existing middleware definitions
-            $this -> middlewareDefinitions = array_merge($this -> middlewareDefinitions, $definitions);
+            $this->middlewareDefinitions = array_merge($this->middlewareDefinitions, $definitions);
             return $this;
         }
 
@@ -69,7 +69,7 @@ if (! trait_exists('RouterRouteHandler')) {
 
             // loop through each route and register it
             foreach ($routes as $route) {
-                $this -> registerSingleRoute($route);
+                $this->registerSingleRoute($route);
             }
 
             // return for chaining
@@ -101,17 +101,17 @@ if (! trait_exists('RouterRouteHandler')) {
             $method = strtoupper($route['method']);
             $path = $route['path'];
             $handler = $route['handler'];
-            $middlewares = $route['middleware'] ?? [ ];
+            $middlewares = $route['middleware'] ?? [];
             $should_cache = $route['should_cache'] ?? false;
             $cache_length = $route['cache_length'] ?? 3600;
-            $data = $route['data'] ?? [ ];
+            $data = $route['data'] ?? [];
 
             // make sure the cache flag is passed through
             $data['should_cache'] = $should_cache;
             $data['cache_length'] = $cache_length;
 
             // validate HTTP method
-            if (! in_array($method, [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'TRACE', 'CONNECT' ])) {
+            if (! in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'TRACE', 'CONNECT'])) {
                 Logger::error('Invalid HTTP Method', [$method]);
                 throw new \InvalidArgumentException("Invalid HTTP method: {$method}");
             }
@@ -126,11 +126,11 @@ if (! trait_exists('RouterRouteHandler')) {
             ]);
 
             // resolve handler and wrap with middlewares
-            $callableHandler = $this -> resolveHandler($handler, $data);
-            $wrappedHandler = $this -> createWrappedHandler($callableHandler, $middlewares);
+            $callableHandler = $this->resolveHandler($handler, $data);
+            $wrappedHandler = $this->createWrappedHandler($callableHandler, $middlewares);
 
             // now add the route
-            $this -> addRoute($method, $path, $wrappedHandler);
+            $this->addRoute($method, $path, $wrappedHandler);
 
             // return for chaining
             return $this;
@@ -157,12 +157,12 @@ if (! trait_exists('RouterRouteHandler')) {
             $path = self::sanitizePath($path);
 
             // build full path with base path
-            $fullPath = $this -> basePath === '/' ? $path : self::sanitizePath($this -> basePath . $path);
+            $fullPath = $this->basePath === '/' ? $path : self::sanitizePath($this->basePath . $path);
             $fullPath = preg_replace('#/+#', '/', $fullPath);
 
             // register the route if not already exists
-            if (! isset($this -> routes[$method][$fullPath])) {
-                $this -> routes[$method][$fullPath] = $callback;
+            if (! isset($this->routes[$method][$fullPath])) {
+                $this->routes[$method][$fullPath] = $callback;
             }
         }
 
@@ -183,7 +183,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register the middleware by name
-            $this -> middlewareDefinitions[$name] = $middleware;
+            $this->middlewareDefinitions[$name] = $middleware;
             return $this;
         }
 
@@ -202,7 +202,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // return all middleware definitions
-            return $this -> middlewareDefinitions;
+            return $this->middlewareDefinitions;
         }
 
         /**
@@ -221,14 +221,14 @@ if (! trait_exists('RouterRouteHandler')) {
 
             // return routes organized by HTTP method
             return [
-                'GET' => array_keys($this -> routes['GET'] ?? [ ]),
-                'POST' => array_keys($this -> routes['POST'] ?? [ ]),
-                'PUT' => array_keys($this -> routes['PUT'] ?? [ ]),
-                'PATCH' => array_keys($this -> routes['PATCH'] ?? [ ]),
-                'DELETE' => array_keys($this -> routes['DELETE'] ?? [ ]),
-                'HEAD' => array_keys($this -> routes['HEAD'] ?? [ ]),
-                'TRACE' => array_keys($this -> routes['TRACE'] ?? [ ]),
-                'CONNECT' => array_keys($this -> routes['CONNECT'] ?? [ ]),
+                'GET' => array_keys($this->routes['GET'] ?? []),
+                'POST' => array_keys($this->routes['POST'] ?? []),
+                'PUT' => array_keys($this->routes['PUT'] ?? []),
+                'PATCH' => array_keys($this->routes['PATCH'] ?? []),
+                'DELETE' => array_keys($this->routes['DELETE'] ?? []),
+                'HEAD' => array_keys($this->routes['HEAD'] ?? []),
+                'TRACE' => array_keys($this->routes['TRACE'] ?? []),
+                'CONNECT' => array_keys($this->routes['CONNECT'] ?? []),
             ];
         }
 
@@ -249,7 +249,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register GET route
-            $this -> addRoute('GET', $path, $callback);
+            $this->addRoute('GET', $path, $callback);
             return $this;
         }
 
@@ -270,7 +270,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register POST route
-            $this -> addRoute('POST', $path, $callback);
+            $this->addRoute('POST', $path, $callback);
             return $this;
         }
 
@@ -291,7 +291,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register PUT route
-            $this -> addRoute('PUT', $path, $callback);
+            $this->addRoute('PUT', $path, $callback);
             return $this;
         }
 
@@ -312,7 +312,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register PATCH route
-            $this -> addRoute('PATCH', $path, $callback);
+            $this->addRoute('PATCH', $path, $callback);
             return $this;
         }
 
@@ -333,7 +333,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register DELETE route
-            $this -> addRoute('DELETE', $path, $callback);
+            $this->addRoute('DELETE', $path, $callback);
             return $this;
         }
 
@@ -354,7 +354,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register HEAD route
-            $this -> addRoute('HEAD', $path, $callback);
+            $this->addRoute('HEAD', $path, $callback);
             return $this;
         }
 
@@ -375,7 +375,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register TRACE route
-            $this -> addRoute('TRACE', $path, $callback);
+            $this->addRoute('TRACE', $path, $callback);
             return $this;
         }
 
@@ -396,7 +396,7 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // register CONNECT route
-            $this -> addRoute('CONNECT', $path, $callback);
+            $this->addRoute('CONNECT', $path, $callback);
             return $this;
         }
     }

@@ -57,17 +57,17 @@ if (! trait_exists('RouterRateLimiter')) {
          * @return bool Returns true if rate limiting was enabled successfully
          */
         // phpcs:ignore Generic.Files.LineLength.TooLong
-        public function enableRateLimiter(array $redisConfig = [ 'host' => '127.0.0.1', 'port' => 6379, 'timeout' => 0.0, 'password' => null ]): bool
+        public function enableRateLimiter(array $redisConfig = ['host' => '127.0.0.1', 'port' => 6379, 'timeout' => 0.0, 'password' => null]): bool
         {
 
             // First try to initialize Redis rate limiting
-            if ($this -> initRedisRateLimiting($redisConfig)) {
+            if ($this->initRedisRateLimiting($redisConfig)) {
                 Logger::debug('Rate limiting enabled with Redis backend');
                 return true;
             }
 
             // Fall back to file-based rate limiting
-            $this -> enableFileRateLimiting();
+            $this->enableFileRateLimiting();
             Logger::debug('Rate limiting enabled with file backend (Redis unavailable)');
             return true;
         }
@@ -85,14 +85,14 @@ if (! trait_exists('RouterRateLimiter')) {
          * @return bool Returns true if initialization succeeded, false otherwise
          */
         // phpcs:ignore Generic.Files.LineLength.TooLong
-        private function initRedisRateLimiting(array $config = [ 'host' => '127.0.0.1', 'port' => 6379, 'timeout' => 0.0, 'password' => null ]): bool
+        private function initRedisRateLimiting(array $config = ['host' => '127.0.0.1', 'port' => 6379, 'timeout' => 0.0, 'password' => null]): bool
         {
 
             // try to initialize redis connection
             try {
                 // create new redis instance
-                $this -> redis = new \Redis();
-                $connected = $this -> redis -> connect(
+                $this->redis = new \Redis();
+                $connected = $this->redis->connect(
                     $config['host'],
                     $config['port'],
                     $config['timeout']
@@ -105,26 +105,26 @@ if (! trait_exists('RouterRateLimiter')) {
                 }
 
                 // configure redis settings
-                $this -> redis -> select(1);
-                $this -> redis -> setOption(\Redis::OPT_PREFIX, ( KPT_URI ?? 'kpt_router' ) . '_RL:');
+                $this->redis->select(1);
+                $this->redis->setOption(\Redis::OPT_PREFIX, (KPT_URI ?? 'kpt_router') . '_RL:');
 
                 // authenticate if password provided
                 if (! empty($config['password'])) {
-                    $this -> redis -> auth($config['password']);
+                    $this->redis->auth($config['password']);
                 }
 
                 // test connection with ping
-                $this -> redis -> ping();
+                $this->redis->ping();
 
                 // set storage type and enable rate limiting
-                $this -> rateLimits['global']['storage'] = 'redis';
-                $this -> rateLimitingEnabled = true;
+                $this->rateLimits['global']['storage'] = 'redis';
+                $this->rateLimitingEnabled = true;
                 return true;
 
-            // whoopsie... log error and return false
+                // whoopsie... log error and return false
             } catch (\Throwable $e) {
-                Logger::error('Redis ratelimiter failed', ['error' => $e -> getMessage()]);
-                $this -> rateLimitingEnabled = false;
+                Logger::error('Redis ratelimiter failed', ['error' => $e->getMessage()]);
+                $this->rateLimitingEnabled = false;
                 return false;
             }
         }
@@ -144,13 +144,13 @@ if (! trait_exists('RouterRateLimiter')) {
         {
 
             // Ensure the rate limit directory exists
-            if (! is_dir($this -> rateLimitPath)) {
-                mkdir($this -> rateLimitPath, 0755, true);
+            if (! is_dir($this->rateLimitPath)) {
+                mkdir($this->rateLimitPath, 0755, true);
             }
 
             // configure for file storage and enable
-            $this -> rateLimits['global']['storage'] = 'file';
-            $this -> rateLimitingEnabled = true;
+            $this->rateLimits['global']['storage'] = 'file';
+            $this->rateLimitingEnabled = true;
         }
 
         /**
@@ -168,7 +168,7 @@ if (! trait_exists('RouterRateLimiter')) {
         {
 
             // disable rate limiting
-            $this -> rateLimitingEnabled = false;
+            $this->rateLimitingEnabled = false;
         }
 
         /**
@@ -187,7 +187,7 @@ if (! trait_exists('RouterRateLimiter')) {
         {
 
             // check if rate limiting is enabled
-            if (! $this -> rateLimitingEnabled) {
+            if (! $this->rateLimitingEnabled) {
                 return;
             }
 
@@ -196,17 +196,17 @@ if (! trait_exists('RouterRateLimiter')) {
             $cacheKey = 'rate_limit_' . md5($clientIp);
 
             // get rate limit configuration
-            $limit = $this -> rateLimits['global']['limit'];
-            $window = $this -> rateLimits['global']['window'];
-            $storageType = $this -> rateLimits['global']['storage'];
+            $limit = $this->rateLimits['global']['limit'];
+            $window = $this->rateLimits['global']['window'];
+            $storageType = $this->rateLimits['global']['storage'];
 
             // try to apply rate limiting
             try {
                 // handle rate limiting based on storage type
-                if ($storageType === 'redis' && $this -> redis !== null) {
-                    $current = $this -> handleRedisRateLimit($cacheKey, $limit, $window);
+                if ($storageType === 'redis' && $this->redis !== null) {
+                    $current = $this->handleRedisRateLimit($cacheKey, $limit, $window);
                 } else {
-                    $current = $this -> handleFileRateLimit($cacheKey, $limit, $window);
+                    $current = $this->handleFileRateLimit($cacheKey, $limit, $window);
                 }
 
                 // check if rate limit exceeded
@@ -219,14 +219,14 @@ if (! trait_exists('RouterRateLimiter')) {
                 // set rate limit headers
                 header('X-RateLimit-Limit: ' . $limit);
                 header('X-RateLimit-Remaining: ' . max(0, $limit - $current - 1));
-                header('X-RateLimit-Reset: ' . ( time() + $window ));
+                header('X-RateLimit-Reset: ' . (time() + $window));
 
-            // whoopsie... handle rate limiting errors
+                // whoopsie... handle rate limiting errors
             } catch (\Exception $e) {
-                Logger::error('Rate limiting error', ['error' => $e -> getMessage()]);
+                Logger::error('Rate limiting error', ['error' => $e->getMessage()]);
 
                 // check if strict mode is enabled
-                if ($this -> rateLimits['global']['strict_mode'] ?? false) {
+                if ($this->rateLimits['global']['strict_mode'] ?? false) {
                     Logger::error('Rate limiting error', ['error' => 'Rate limit service unavailable']);
                     throw new \RuntimeException('Rate limit service unavailable', 503);
                 }
@@ -251,7 +251,7 @@ if (! trait_exists('RouterRateLimiter')) {
         {
 
             // get current count from redis
-            $current = $this -> redis -> get($key);
+            $current = $this->redis->get($key);
 
             // check if key exists
             if ($current !== false) {
@@ -261,12 +261,12 @@ if (! trait_exists('RouterRateLimiter')) {
                 }
 
                 // increment the counter
-                $this -> redis -> incr($key);
+                $this->redis->incr($key);
                 return (int) $current + 1;
             }
 
             // first request - set initial count with expiration
-            $this -> redis -> setex($key, $window, 1);
+            $this->redis->setex($key, $window, 1);
             return 1;
         }
 
@@ -288,7 +288,7 @@ if (! trait_exists('RouterRateLimiter')) {
         {
 
             // setup file path and current time
-            $file = $this -> rateLimitPath . '/' . $key;
+            $file = $this->rateLimitPath . '/' . $key;
             $now = time();
 
             // check if file exists

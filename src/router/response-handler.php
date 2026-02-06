@@ -30,7 +30,7 @@ if (! trait_exists('RouterResponseHandler')) {
         private string $viewsPath = '';
 
         // shared view data
-        private array $viewData = [ ];
+        private array $viewData = [];
 
         /**
          * Set the views directory path
@@ -48,7 +48,7 @@ if (! trait_exists('RouterResponseHandler')) {
         {
 
             // set the views path without trailing slash
-            $this -> viewsPath = rtrim($path, '/');
+            $this->viewsPath = rtrim($path, '/');
             return $this;
         }
 
@@ -66,11 +66,11 @@ if (! trait_exists('RouterResponseHandler')) {
          * @return string Returns the rendered content
          * @throws RuntimeException If view file not found
          */
-        public function view(string $template, array $data = [ ]): string
+        public function view(string $template, array $data = []): string
         {
 
             // build full template path
-            $templatePath = $this -> viewsPath . '/' . ltrim($template, '/');
+            $templatePath = $this->viewsPath . '/' . ltrim($template, '/');
 
             // check if template file exists
             if (! file_exists($templatePath)) {
@@ -79,7 +79,7 @@ if (! trait_exists('RouterResponseHandler')) {
             }
 
             // extract view data and shared data
-            extract(array_merge($this -> viewData, $data), EXTR_SKIP);
+            extract(array_merge($this->viewData, $data), EXTR_SKIP);
             ob_start();
 
             // try to render the template
@@ -88,7 +88,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 return ob_get_clean();
             } catch (\Throwable $e) {
                 ob_end_clean();
-                Logger::error("View rendering failed", ['error' => $e -> getMessage()]);
+                Logger::error("View rendering failed", ['error' => $e->getMessage()]);
                 throw $e;
             }
         }
@@ -111,9 +111,9 @@ if (! trait_exists('RouterResponseHandler')) {
 
             // handle array of data or single key-value pair
             if (is_array($key)) {
-                $this -> viewData = array_merge($this -> viewData, $key);
+                $this->viewData = array_merge($this->viewData, $key);
             } else {
-                $this -> viewData[$key] = $value;
+                $this->viewData[$key] = $value;
             }
 
             // return for chaining
@@ -134,7 +134,7 @@ if (! trait_exists('RouterResponseHandler')) {
          * @return callable Returns the resolved handler
          * @throws InvalidArgumentException If handler cannot be resolved
          */
-        private function resolveHandler($handler, array $data = [ ]): callable
+        private function resolveHandler($handler, array $data = []): callable
         {
 
             // return if already callable
@@ -147,32 +147,28 @@ if (! trait_exists('RouterResponseHandler')) {
                 // check for type-prefixed handlers (view:, controller:)
                 if (strpos($handler, ':') !== false) {
                     // split type and target
-                    list( $type, $target ) = explode(':', $handler, 2);
+                    list($type, $target) = explode(':', $handler, 2);
+
+                    // make sure we have a type
+                    if (!in_array($type, ['view', 'controller'])) {
+                        Logger::error("Unknown handler type", ['type' => $type]);
+                    }
 
                     // handle based on type
-                    switch ($type) {
-                        // view
-                        case 'view':
-                            return $this -> createViewHandler($target, $data);
-
-                        // controller
-                        case 'controller':
-                            return $this -> createControllerHandler($target, $data);
-
-                        // unknown type
-                        default:
-                            Logger::error("Unknown handler type", ['type' => $type]);
-                            throw new \InvalidArgumentException("Unknown handler type: {$type}");
-                    }
+                    return match ($type) {
+                        'view' => $this->createViewHandler($target, $data),
+                        'controller' => $this->createControllerHandler($target, $data),
+                        default => throw new \InvalidArgumentException("Unknown handler type: {$type}")
+                    };
                 }
 
                 // Check if it's a controller format (Class@method)
                 if (strpos($handler, '@') !== false) {
-                    return $this -> createControllerHandler($handler);
+                    return $this->createControllerHandler($handler);
                 }
 
                 // default to view handler
-                return $this -> createViewHandler($handler, $data);
+                return $this->createViewHandler($handler, $data);
             }
 
             // handler format not supported
@@ -206,7 +202,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 $currentRoute = self::getCurrentRoute();
 
                 // loop the route parameters
-                foreach ($currentRoute -> params as $key => $value) {
+                foreach ($currentRoute->params as $key => $value) {
                     $viewData[$key] = $value;
                 }
 
@@ -227,7 +223,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 }
 
                 // should the view be cached?
-                $should_cache = ( isset($viewData['should_cache']) && $viewData['should_cache'] ) ?? false;
+                $should_cache = (isset($viewData['should_cache']) && $viewData['should_cache']) ?? false;
 
                 // if caching is enabled, try to get from cache first
                 if ($should_cache) {
@@ -244,7 +240,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 }
 
                 // render the view
-                $content = $this -> view($viewPath, $viewData);
+                $content = $this->view($viewPath, $viewData);
 
                 // cache if needed, for at least 1 hour
                 if ($should_cache) {
@@ -271,7 +267,7 @@ if (! trait_exists('RouterResponseHandler')) {
          * @throws InvalidArgumentException If controller format is invalid
          * @throws RuntimeException If controller class doesn't exist or method is not callable
          */
-        private function createControllerHandler(string $controller, array $data = [ ]): callable
+        private function createControllerHandler(string $controller, array $data = []): callable
         {
 
             // return closure that handles controller execution
@@ -287,7 +283,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 }
 
                 // should the controller be cached?
-                $should_cache = ( isset($data['should_cache']) && $data['should_cache'] ) ?? false;
+                $should_cache = (isset($data['should_cache']) && $data['should_cache']) ?? false;
 
                 // If caching is enabled, try to get from cache first
                 if ($should_cache) {
@@ -310,7 +306,7 @@ if (! trait_exists('RouterResponseHandler')) {
                 }
 
                 // split class and method
-                list( $class, $method ) = explode('@', $controller, 2);
+                list($class, $method) = explode('@', $controller, 2);
 
                 // Trim any whitespace
                 $class = trim($class);
@@ -339,13 +335,13 @@ if (! trait_exists('RouterResponseHandler')) {
                 }
 
                 // verify method is callable
-                if (! is_callable([ $controllerInstance, $method ])) {
+                if (! is_callable([$controllerInstance, $method])) {
                     Logger::error('Method Not Callable', [$method]);
                     throw new \RuntimeException("Method '{$method}' is not callable in controller '{$class}'");
                 }
 
                 // Call the controller method with parameters
-                $result = call_user_func_array([ $controllerInstance, $method ], $params);
+                $result = call_user_func_array([$controllerInstance, $method], $params);
 
                 // check of the cache data exists, and if it's true cache it
                 if ($should_cache) {

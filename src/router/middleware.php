@@ -39,7 +39,7 @@ if (! trait_exists('RouterMiddlewareHandler')) {
         {
 
             // add it to the array
-            $this -> middlewares[] = $middleware;
+            $this->middlewares[] = $middleware;
             Logger::debug("Added to middleware", ['callable' => $middleware]);
             return $this;
         }
@@ -91,13 +91,13 @@ if (! trait_exists('RouterMiddlewareHandler')) {
             // if the middleware is a tring
             if (is_string($middleware)) {
                 // make sure it's actually set as a middleware definition first
-                if (isset($this -> middlewareDefinitions[$middleware])) {
+                if (isset($this->middlewareDefinitions[$middleware])) {
                     // hold the definition
-                    $definition = $this -> middlewareDefinitions[$middleware];
+                    $definition = $this->middlewareDefinitions[$middleware];
 
                     // if it's a string, return the resolved string
                     if (is_string($definition)) {
-                        return $this -> resolveStringMiddleware($definition);
+                        return $this->resolveStringMiddleware($definition);
                     }
 
                     // debug logging
@@ -111,7 +111,7 @@ if (! trait_exists('RouterMiddlewareHandler')) {
                 Logger::debug("Resolve Middlewared", ['middleware' => $middleware]);
 
                 // return the resolved string
-                return $this -> resolveStringMiddleware($middleware);
+                return $this->resolveStringMiddleware($middleware);
             }
 
             // couldn't resolve it, so log the error
@@ -132,8 +132,8 @@ if (! trait_exists('RouterMiddlewareHandler')) {
         {
 
             // Check if it's a registered middleware definition, and return if it is
-            if (isset($this -> middlewareDefinitions[$middleware])) {
-                return $this -> middlewareDefinitions[$middleware];
+            if (isset($this->middlewareDefinitions[$middleware])) {
+                return $this->middlewareDefinitions[$middleware];
             }
 
             // If no middleware found, log warning and return null
@@ -160,7 +160,7 @@ if (! trait_exists('RouterMiddlewareHandler')) {
                 // loop over them
                 foreach ($middlewares as $middleware) {
                     // resolve the middleware
-                    $middlewareCallable = $this -> resolveMiddleware($middleware);
+                    $middlewareCallable = $this->resolveMiddleware($middleware);
 
                     // if it is callable and run, just return
                     if ($middlewareCallable && $middlewareCallable() === false) {
@@ -170,12 +170,11 @@ if (! trait_exists('RouterMiddlewareHandler')) {
 
                 // debug logging
                 // phpcs:ignore Generic.Files.LineLength.TooLong
-                Logger::debug("Middleware Handler", [ 'middlewares' => $middlewares, 'handler' => $handler, 'params' => $params, ]);
+                Logger::debug("Middleware Handler", ['middlewares' => $middlewares, 'handler' => $handler, 'params' => $params,]);
 
                 // return the results from the callable handler
                 return call_user_func_array($handler, $params);
             };
         }
     }
-
 }

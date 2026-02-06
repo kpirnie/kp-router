@@ -36,7 +36,7 @@ if (! trait_exists('RouterRequestProcessor')) {
         private static string $currentPath = '';
 
         // current route parameters
-        private static array $currentParams = [ ];
+        private static array $currentParams = [];
 
         /**
          * Set 404 Not Found handler
@@ -54,7 +54,7 @@ if (! trait_exists('RouterRequestProcessor')) {
         {
 
             // set the not found callback
-            $this -> notFoundCallback = $callback;
+            $this->notFoundCallback = $callback;
             return $this;
         }
 
@@ -75,42 +75,42 @@ if (! trait_exists('RouterRequestProcessor')) {
             // try to process the request
             try {
                 // get current request details
-                self::$currentMethod = $this -> getRequestMethod();
-                self::$currentPath = $this -> getRequestUri();
+                self::$currentMethod = $this->getRequestMethod();
+                self::$currentPath = $this->getRequestUri();
 
                 // execute middlewares first
-                if ($this -> executeMiddlewares($this -> middlewares) === false) {
+                if ($this->executeMiddlewares($this->middlewares) === false) {
                     return;
                 }
 
                 // apply rate limiting if enabled
-                if ($this -> rateLimitingEnabled) {
-                    $this -> applyRateLimiting();
+                if ($this->rateLimitingEnabled) {
+                    $this->applyRateLimiting();
                 }
 
                 // find matching route handler
-                $handler = $this -> findRouteHandler(self::$currentMethod, self::$currentPath);
+                $handler = $this->findRouteHandler(self::$currentMethod, self::$currentPath);
 
                 // execute handler or 404 callback
                 if ($handler) {
                     // set current params and execute handler
                     self::$currentParams = $handler['params'];
-                    $this -> executeHandler($handler['callback'], $handler['params']);
+                    $this->executeHandler($handler['callback'], $handler['params']);
 
-                // check if we have a custom 404 handler
-                } elseif ($this -> notFoundCallback) {
-                    $this -> executeHandler($this -> notFoundCallback);
+                    // check if we have a custom 404 handler
+                } elseif ($this->notFoundCallback) {
+                    $this->executeHandler($this->notFoundCallback);
 
-                // default 404 response
+                    // default 404 response
                 } else {
                     error_log("No handler found for " . self::$currentMethod . " " . self::$currentPath);
-                    $this -> sendNotFoundResponse();
+                    $this->sendNotFoundResponse();
                 }
 
-            // whoopsie... handle dispatch errors
+                // whoopsie... handle dispatch errors
             } catch (\Throwable $e) {
-                Logger::error("Dispatch error", ['error' => $e -> getMessage()]);
-                $this -> handleError($e);
+                Logger::error("Dispatch error", ['error' => $e->getMessage()]);
+                $this->handleError($e);
             }
         }
 
@@ -129,7 +129,7 @@ if (! trait_exists('RouterRequestProcessor')) {
         {
 
             // parse and sanitize the URI
-            $uri = parse_url(( self::getUserUri() ), PHP_URL_PATH);
+            $uri = parse_url((self::getUserUri()), PHP_URL_PATH);
             return self::sanitizePath($uri);
         }
 
@@ -151,7 +151,7 @@ if (! trait_exists('RouterRequestProcessor')) {
             $method = $_SERVER['REQUEST_METHOD'];
 
             // validate method and return
-            return in_array($method, [ 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE', 'CONNECT' ])
+            return in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE', 'CONNECT'])
                 ? $method
                 : 'GET';
         }
@@ -188,30 +188,30 @@ if (! trait_exists('RouterRequestProcessor')) {
             Logger::debug("Route Match", [
                 'method' => $method,
                 'uri' => $uri,
-                'available_routes' => array_keys($this -> routes[$method] ?? [ ])
+                'available_routes' => array_keys($this->routes[$method] ?? [])
             ]);
 
             // check for exact match first
-            if (isset($this -> routes[$method][$uri])) {
+            if (isset($this->routes[$method][$uri])) {
                 return [
-                    'callback' => $this -> routes[$method][$uri],
-                    'params' => [ ]
+                    'callback' => $this->routes[$method][$uri],
+                    'params' => []
                 ];
             }
 
             // Also try with trailing slash (for compatibility)
             $uriWithSlash = $uri . '/';
-            if ($uri !== '/' && isset($this -> routes[$method][$uriWithSlash])) {
+            if ($uri !== '/' && isset($this->routes[$method][$uriWithSlash])) {
                 return [
-                    'callback' => $this -> routes[$method][$uriWithSlash],
-                    'params' => [ ]
+                    'callback' => $this->routes[$method][$uriWithSlash],
+                    'params' => []
                 ];
             }
 
             // try pattern matching for dynamic routes
-            foreach ($this -> routes[$method] ?? [ ] as $routePath => $callback) {
+            foreach ($this->routes[$method] ?? [] as $routePath => $callback) {
                 // convert route to regex pattern
-                $pattern = $this -> convertRouteToPattern($routePath);
+                $pattern = $this->convertRouteToPattern($routePath);
 
                 // log pattern testing
                 Logger::debug("Testing route pattern", [
@@ -246,16 +246,16 @@ if (! trait_exists('RouterRequestProcessor')) {
                 $overrideMethod = strtoupper($_POST['_method']);
 
                 // check if override route exists
-                if (isset($this -> routes[$overrideMethod][$uri])) {
+                if (isset($this->routes[$overrideMethod][$uri])) {
                     return [
-                        'callback' => $this -> routes[$overrideMethod][$uri],
-                        'params' => [ ]
+                        'callback' => $this->routes[$overrideMethod][$uri],
+                        'params' => []
                     ];
                 }
             }
 
             // log no match found
-            Logger::error("No Route Matched", [ 'uri' => $uri ]);
+            Logger::error("No Route Matched", ['uri' => $uri]);
 
             // no route found
             return null;
@@ -293,7 +293,7 @@ if (! trait_exists('RouterRequestProcessor')) {
          * @param array $params Parameters to pass to the handler
          * @return void Returns nothing
          */
-        private function executeHandler(callable $handler, array $params = [ ]): void
+        private function executeHandler(callable $handler, array $params = []): void
         {
 
             // try to execute the handler
@@ -306,15 +306,15 @@ if (! trait_exists('RouterRequestProcessor')) {
                 if (is_string($result)) {
                     echo $result;
 
-                // log unexpected return types
+                    // log unexpected return types
                 } elseif ($result !== null) {
                     error_log("Unexpected return type from handler: " . gettype($result));
                 }
 
-            // whoopsie... handle handler execution errors
+                // whoopsie... handle handler execution errors
             } catch (\Throwable $e) {
-                Logger::error("Handler execution failed", ['error' => $e -> getMessage()]);
-                $this -> handleError($e);
+                Logger::error("Handler execution failed", ['error' => $e->getMessage()]);
+                $this->handleError($e);
             }
         }
 
@@ -355,15 +355,15 @@ if (! trait_exists('RouterRequestProcessor')) {
         {
 
             // log the error with stack trace
-            Logger::error('Router error', ['error' => $e -> getMessage()]);
+            Logger::error('Router error', ['error' => $e->getMessage()]);
 
             // determine appropriate HTTP status code
-            $code = $e -> getCode() >= 400 && $e -> getCode() < 600 ? $e -> getCode() : 500;
+            $code = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             http_response_code($code);
 
             // send error message based on display_errors setting
             if (ini_get('display_errors')) {
-                echo "Error {$code}: " . $e -> getMessage();
+                echo "Error {$code}: " . $e->getMessage();
             } else {
                 echo "An error occurred. Please try again later.";
             }
