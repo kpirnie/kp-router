@@ -135,22 +135,32 @@ if (! class_exists('Router')) {
          */
         public static function getUserIp(): string
         {
+            // evaluate trusted headers in order and return first valid address
+            $candidates = [];
 
-            // check if we've got a client ip header, and if it's valid
-            // phpcs:ignore Generic.Files.LineLength.TooLong
-            if (isset($_SERVER['HTTP_CLIENT_IP']) && filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                // return it
-                return filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_SANITIZE_URL);
-                // maybe they're proxying?
-                // phpcs:ignore Generic.Files.LineLength.TooLong
-            } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && filter_var($_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                // return it
-                return filter_var($_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_SANITIZE_URL);
-                // if all else fails, this should exist!
-                // phpcs:ignore Generic.Files.LineLength.TooLong
-            } elseif (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                // return it
-                return filter_var($_SERVER['REMOTE_ADDR'], FILTER_SANITIZE_URL);
+            // proxy headers can include multiple values, so evaluate each
+            foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'] as $header) {
+                if (! isset($_SERVER[$header]) || ! is_string($_SERVER[$header])) {
+                    continue;
+                }
+
+                foreach (explode(',', $_SERVER[$header]) as $ip) {
+                    $candidates[] = trim($ip);
+                }
+            }
+
+            // first try public addresses
+            foreach ($candidates as $candidate) {
+                if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $candidate;
+                }
+            }
+
+            // fallback to any syntactically valid address
+            foreach ($candidates as $candidate) {
+                if (filter_var($candidate, FILTER_VALIDATE_IP)) {
+                    return $candidate;
+                }
             }
 
             // default return
@@ -174,9 +184,18 @@ if (! class_exists('Router')) {
         public static function getUserUri(): string
         {
 
+            $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+            $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+
+            // strip host header port and validate allowed host characters
+            $host = preg_replace('/:\\d+$/', '', trim($host));
+            if (! preg_match('/^[a-z0-9.-]+$/i', $host)) {
+                $host = 'localhost';
+            }
+
             // return the current URL
             // phpcs:ignore Generic.Files.LineLength.TooLong
-            return filter_var((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
+            return filter_var((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $host . $requestUri, FILTER_SANITIZE_URL);
         }
 
         /**

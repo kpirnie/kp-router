@@ -38,6 +38,9 @@ if (! trait_exists('RouterRequestProcessor')) {
         // current route parameters
         private static array $currentParams = [];
 
+        // route regex cache by method and route path
+        private array $routePatternCache = [];
+
         /**
          * Set 404 Not Found handler
          *
@@ -211,7 +214,7 @@ if (! trait_exists('RouterRequestProcessor')) {
             // try pattern matching for dynamic routes
             foreach ($this->routes[$method] ?? [] as $routePath => $callback) {
                 // convert route to regex pattern
-                $pattern = $this->convertRouteToPattern($routePath);
+                $pattern = $this->getOrCreateRoutePattern($method, $routePath);
 
                 // log pattern testing
                 Logger::debug("Testing route pattern", [
@@ -259,6 +262,26 @@ if (! trait_exists('RouterRequestProcessor')) {
 
             // no route found
             return null;
+        }
+
+        /**
+         * Get or create a compiled route pattern
+         *
+         * Caches route regex pattern generation to avoid repeated
+         * string processing on every request dispatch.
+         *
+         * @param string $method HTTP request method
+         * @param string $routePath Route path as defined in router
+         * @return string Returns compiled regex pattern
+         */
+        private function getOrCreateRoutePattern(string $method, string $routePath): string
+        {
+
+            if (! isset($this->routePatternCache[$method][$routePath])) {
+                $this->routePatternCache[$method][$routePath] = $this->convertRouteToPattern($routePath);
+            }
+
+            return $this->routePatternCache[$method][$routePath];
         }
 
         /**
