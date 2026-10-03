@@ -59,21 +59,6 @@ if (! class_exists('Router')) {
             $this->appPath = !empty($appPath) ? rtrim($appPath, '/') : getcwd();
             $this->viewsPath = $this->appPath . '/views';
             $this->rateLimitPath = $this->appPath . '/tmp/kpt_rate_limits';
-            // if the file base rate limiter path doesnt exist, create it
-            if (! file_exists($this->rateLimitPath)) {
-                // try to create the directory
-                try {
-                    // create the directory
-                    mkdir($this->rateLimitPath, 0755, true);
-                    // whoopsie...
-                } catch (\Exception $e) {
-                    // error logging
-                    Logger::error("Router Rate Limit Directory Creation Failed", [
-                        'path' => $this->rateLimitPath,
-                        'message' => $e->getMessage()
-                    ]);
-                }
-            }
 
             // debug logging
             Logger::debug("Router Constructor Completed", [
