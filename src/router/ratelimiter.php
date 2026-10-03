@@ -104,14 +104,14 @@ if (! trait_exists('RouterRateLimiter')) {
                     throw new \RuntimeException('Failed to connect to Redis');
                 }
 
-                // configure redis settings
-                $this->redis->select(1);
-                $this->redis->setOption(\Redis::OPT_PREFIX, (KPT_URI ?? 'kpt_router') . '_RL:');
-
                 // authenticate if password provided
                 if (! empty($config['password'])) {
                     $this->redis->auth($config['password']);
                 }
+
+                // configure redis settings
+                $this->redis->select((int) ($config['database'] ?? 1));
+                $this->redis->setOption(\Redis::OPT_PREFIX, ($config['prefix'] ?? 'kpt_router') . '_RL:');
 
                 // test connection with ping
                 $this->redis->ping();
