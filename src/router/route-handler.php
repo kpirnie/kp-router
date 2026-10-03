@@ -116,7 +116,7 @@ if (! trait_exists('RouterRouteHandler')) {
             $data['cache_vary'] = $route['cache_vary'] ?? null;
 
             // validate HTTP method
-            if (! in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'TRACE', 'CONNECT'])) {
+            if (! in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])) {
                 Logger::error('Invalid HTTP Method', [$method]);
                 throw new \InvalidArgumentException("Invalid HTTP method: {$method}");
             }
@@ -237,8 +237,7 @@ if (! trait_exists('RouterRouteHandler')) {
                 'PATCH' => array_keys($this->routes['PATCH'] ?? []),
                 'DELETE' => array_keys($this->routes['DELETE'] ?? []),
                 'HEAD' => array_keys($this->routes['HEAD'] ?? []),
-                'TRACE' => array_keys($this->routes['TRACE'] ?? []),
-                'CONNECT' => array_keys($this->routes['CONNECT'] ?? []),
+                'OPTIONS' => array_keys($this->routes['OPTIONS'] ?? []),
             ];
         }
 
@@ -369,9 +368,9 @@ if (! trait_exists('RouterRouteHandler')) {
         }
 
         /**
-         * Register a TRACE route
+         * Register an OPTIONS route
          *
-         * Registers a route that responds to HTTP TRACE requests
+         * Registers a route that responds to HTTP OPTIONS requests
          * with the specified path and handler.
          *
          * @since 8.4
@@ -381,32 +380,11 @@ if (! trait_exists('RouterRouteHandler')) {
          * @param callable $callback Route handler
          * @return self Returns the router instance for method chaining
          */
-        public function trace(string $path, callable $callback): self
+        public function options(string $path, callable $callback): self
         {
 
-            // register TRACE route
-            $this->addRoute('TRACE', $path, $callback);
-            return $this;
-        }
-
-        /**
-         * Register a CONNECT route
-         *
-         * Registers a route that responds to HTTP CONNECT requests
-         * with the specified path and handler.
-         *
-         * @since 8.4
-         * @author Kevin Pirnie <me@kpirnie.com>
-         *
-         * @param string $path Route path
-         * @param callable $callback Route handler
-         * @return self Returns the router instance for method chaining
-         */
-        public function connect(string $path, callable $callback): self
-        {
-
-            // register CONNECT route
-            $this->addRoute('CONNECT', $path, $callback);
+            // register OPTIONS route
+            $this->addRoute('OPTIONS', $path, $callback);
             return $this;
         }
     }

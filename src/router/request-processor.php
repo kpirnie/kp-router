@@ -156,9 +156,9 @@ if (! trait_exists('RouterRequestProcessor')) {
             $method = $_SERVER['REQUEST_METHOD'];
 
             // validate method and return
-            return in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE', 'CONNECT'])
+            return in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'])
                 ? $method
-                : 'GET';
+                : '';
         }
 
         /**
