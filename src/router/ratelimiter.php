@@ -210,7 +210,7 @@ if (! trait_exists('RouterRateLimiter')) {
                 }
 
                 // check if rate limit exceeded
-                if ($current >= $limit) {
+                if ($current > $limit) {
                     header('Retry-After: ' . $window);
                     Logger::error('Rate limit exceeded', ['hits' => $current]);
                     throw new \RuntimeException('Rate limit exceeded', 429);
@@ -218,7 +218,7 @@ if (! trait_exists('RouterRateLimiter')) {
 
                 // set rate limit headers
                 header('X-RateLimit-Limit: ' . $limit);
-                header('X-RateLimit-Remaining: ' . max(0, $limit - $current - 1));
+                header('X-RateLimit-Remaining: ' . max(0, $limit - $current));
                 header('X-RateLimit-Reset: ' . (time() + $window));
 
                 // whoopsie... handle rate limiting errors
