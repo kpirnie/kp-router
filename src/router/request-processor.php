@@ -129,8 +129,8 @@ if (! trait_exists('RouterRequestProcessor')) {
         {
 
             // parse and sanitize the URI
-            $uri = parse_url((self::getUserUri()), PHP_URL_PATH);
-            return self::sanitizePath($uri);
+            $uri = parse_url((Router::getUserUri()), PHP_URL_PATH);
+            return Router::sanitizePath($uri);
         }
 
         /**

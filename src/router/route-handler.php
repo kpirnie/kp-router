@@ -109,6 +109,8 @@ if (! trait_exists('RouterRouteHandler')) {
             // make sure the cache flag is passed through
             $data['should_cache'] = $should_cache;
             $data['cache_length'] = $cache_length;
+            $data['cache_delete'] = $route['cache_delete'] ?? null;
+            $data['cache_vary'] = $route['cache_vary'] ?? null;
 
             // validate HTTP method
             if (! in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'TRACE', 'CONNECT'])) {
@@ -154,10 +156,10 @@ if (! trait_exists('RouterRouteHandler')) {
         {
 
             // sanitize the path
-            $path = self::sanitizePath($path);
+            $path = Router::sanitizePath($path);
 
             // build full path with base path
-            $fullPath = $this->basePath === '/' ? $path : self::sanitizePath($this->basePath . $path);
+            $fullPath = $this->basePath === '/' ? $path : Router::sanitizePath($this->basePath . $path);
             $fullPath = preg_replace('#/+#', '/', $fullPath);
 
             // register the route if not already exists
