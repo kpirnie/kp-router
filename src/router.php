@@ -300,7 +300,13 @@ if (! class_exists('\KPT\Router', false)) {
 
             // return the current URL
             // phpcs:ignore Generic.Files.LineLength.TooLong
-            return filter_var((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
+            return filter_var(
+                (
+                    isset($_SERVER['HTTPS']) &&
+                    $_SERVER['HTTPS'] === 'on' ? "https" : "http"
+                ) . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+                FILTER_SANITIZE_URL
+            );
         }
 
         /**

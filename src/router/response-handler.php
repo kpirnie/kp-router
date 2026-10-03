@@ -220,7 +220,9 @@ if (! trait_exists('\KPT\RouterResponseHandler')) {
                 $viewData = array_merge($viewData, $data);
 
                 // Create a cache key based on view path and data
-                $cache_key = 'view_cache_' . md5($viewPath . serialize($viewData) . $this->getCacheVariance($cacheVary));
+                $cache_key = 'view_cache_' . md5(
+                    $viewPath . serialize($viewData) . $this->getCacheVariance($cacheVary)
+                );
 
                 // purge on post, or on a cachedel request the route's gate allows
                 if (
@@ -231,7 +233,11 @@ if (! trait_exists('\KPT\RouterResponseHandler')) {
                 }
 
                 // should the view be cached?
-                $should_cache = (isset($viewData['should_cache']) && $viewData['should_cache'] && $this->isCacheableRequest($cacheVary));
+                $should_cache = (
+                    isset($viewData['should_cache']) &&
+                    $viewData['should_cache'] &&
+                    $this->isCacheableRequest($cacheVary)
+                );
 
                 // if caching is enabled, try to get from cache first
                 if ($should_cache) {
@@ -283,7 +289,9 @@ if (! trait_exists('\KPT\RouterResponseHandler')) {
 
                 // Create a cache key based on controller, method, and params
                 $cacheVary = $data['cache_vary'] ?? null;
-                $cache_key = 'cont_cache_' . md5($controller . serialize($params) . $this->getCacheVariance($cacheVary));
+                $cache_key = 'cont_cache_' . md5(
+                    $controller . serialize($params) . $this->getCacheVariance($cacheVary)
+                );
 
                 // purge on post, or on a cachedel request the route's gate allows
                 $cacheDelete = $data['cache_delete'] ?? null;
@@ -296,7 +304,11 @@ if (! trait_exists('\KPT\RouterResponseHandler')) {
                 }
 
                 // should the controller be cached?
-                $should_cache = (isset($data['should_cache']) && $data['should_cache'] && $this->isCacheableRequest($cacheVary));
+                $should_cache = (
+                    isset($data['should_cache']) &&
+                    $data['should_cache'] &&
+                    $this->isCacheableRequest($cacheVary)
+                );
 
                 // If caching is enabled, try to get from cache first
                 if ($should_cache) {
