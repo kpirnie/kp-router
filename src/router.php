@@ -333,7 +333,7 @@ if (! class_exists('Router')) {
             if (empty($path)) {
                 return '/';
             }
-            $path = parse_url($path, PHP_URL_PATH) ?? '';
+            $path = preg_split('/[?#]/', $path, 2)[0];
             $path = preg_replace('#/+#', '/', $path);
             // Only normalize multiple slashes
             $path = trim($path, '/');

@@ -129,7 +129,12 @@ if (! trait_exists('RouterRequestProcessor')) {
         {
 
             // parse and sanitize the URI
-            $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+            $uri = $_SERVER['REQUEST_URI'] ?? '/';
+
+            // absolute-form request targets carry the scheme and host, so pull just the path
+            if (! str_starts_with($uri, '/')) {
+                $uri = parse_url($uri, PHP_URL_PATH);
+            }
             return Router::sanitizePath(is_string($uri) ? $uri : '/');
         }
 
