@@ -254,24 +254,16 @@ if (! trait_exists('RouterRateLimiter')) {
         private function handleRedisRateLimit(string $key, int $limit, int $window): int
         {
 
-            // get current count from redis
-            $current = $this->redis->get($key);
+            // atomically increment the counter
+            $current = (int) $this->redis->incr($key);
 
-            // check if key exists
-            if ($current !== false) {
-                // check if already at limit
-                if ((int) $current >= $limit) {
-                    return (int) $current;
-                }
-
-                // increment the counter
-                $this->redis->incr($key);
-                return (int) $current + 1;
+            // first request in the window - set the expiration
+            if ($current === 1) {
+                $this->redis->expire($key, $window);
             }
 
-            // first request - set initial count with expiration
-            $this->redis->setex($key, $window, 1);
-            return 1;
+            // return the current count
+            return $current;
         }
 
         /**
