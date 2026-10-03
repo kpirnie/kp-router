@@ -281,8 +281,19 @@ if (! trait_exists('RouterRequestProcessor')) {
         private function convertRouteToPattern(string $routePath): string
         {
 
-            // convert parameter placeholders to named capture groups
-            return '#^' . preg_replace('/\{([a-z][a-z0-9_]*)\}/i', '(?P<$1>[^/]+)', $routePath) . '$#i';
+            // split out the parameter placeholders, keeping them
+            $parts = preg_split('/(\{[a-z][a-z0-9_]*\})/i', $routePath, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            // quote the literal parts and turn the placeholders into named capture groups
+            $pattern = '';
+            foreach ($parts as $part) {
+                $pattern .= preg_match('/^\{([a-z][a-z0-9_]*)\}$/i', $part, $m)
+                    ? '(?P<' . $m[1] . '>[^/]+)'
+                    : preg_quote($part, '#');
+            }
+
+            // return the case-sensitive pattern
+            return '#^' . $pattern . '$#';
         }
 
         /**
