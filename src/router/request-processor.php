@@ -358,12 +358,13 @@ if (! trait_exists('RouterRequestProcessor')) {
             Logger::error('Router error', ['error' => $e->getMessage()]);
 
             // determine appropriate HTTP status code
-            $code = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            $code = $e->getCode();
+            $code = is_int($code) && $code >= 400 && $code < 600 ? $code : 500;
             http_response_code($code);
 
             // send error message based on display_errors setting
-            if (ini_get('display_errors')) {
-                echo "Error {$code}: " . $e->getMessage();
+            if (filter_var(ini_get('display_errors'), FILTER_VALIDATE_BOOLEAN)) {
+                echo "Error {$code}: " . htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             } else {
                 echo "An error occurred. Please try again later.";
             }
