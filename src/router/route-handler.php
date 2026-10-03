@@ -29,6 +29,9 @@ if (! trait_exists('RouterRouteHandler')) {
         // registered routes by HTTP method
         private array $routes = [];
 
+        // precompiled regex patterns for dynamic routes by HTTP method
+        private array $compiledRoutes = [];
+
         // middleware definitions registry
         private array $middlewareDefinitions = [];
 
@@ -165,6 +168,11 @@ if (! trait_exists('RouterRouteHandler')) {
             // register the route if not already exists
             if (! isset($this->routes[$method][$fullPath])) {
                 $this->routes[$method][$fullPath] = $callback;
+
+                // precompile the pattern for dynamic routes
+                if (str_contains($fullPath, '{')) {
+                    $this->compiledRoutes[$method][$fullPath] = $this->convertRouteToPattern($fullPath);
+                }
             }
         }
 

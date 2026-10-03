@@ -213,17 +213,10 @@ if (! trait_exists('RouterRequestProcessor')) {
                 ];
             }
 
-            // try pattern matching for dynamic routes
-            foreach ($this->routes[$method] ?? [] as $routePath => $callback) {
-                // convert route to regex pattern
-                $pattern = $this->convertRouteToPattern($routePath);
-
-                // log pattern testing
-                Logger::debug("Testing route pattern", [
-                    'pattern' => $pattern,
-                    'route_path' => $routePath,
-                    'testing_against' => $uri
-                ]);
+            // try the precompiled patterns for dynamic routes
+            foreach ($this->compiledRoutes[$method] ?? [] as $routePath => $pattern) {
+                // hold the route's callback
+                $callback = $this->routes[$method][$routePath];
 
                 // test pattern against URI (with and without trailing slash)
                 if (
