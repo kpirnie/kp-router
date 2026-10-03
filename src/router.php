@@ -15,7 +15,7 @@
 namespace KPT;
 
 // if the class does not exist already
-if (! class_exists('Router')) {
+if (! class_exists('\KPT\Router', false)) {
 
     /**
      * KPT Router Class

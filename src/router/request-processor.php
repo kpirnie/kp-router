@@ -12,7 +12,7 @@
 namespace KPT;
 
 // make sure the trait doesn't exist first
-if (! trait_exists('RouterRequestProcessor')) {
+if (! trait_exists('\KPT\RouterRequestProcessor')) {
 
     /**
      * KPT Router Request Processor Trait

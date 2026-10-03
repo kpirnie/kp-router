@@ -12,7 +12,7 @@
 namespace KPT;
 
 // make sure it doesn't already exist
-if (! trait_exists('RouterRouteHandler')) {
+if (! trait_exists('\KPT\RouterRouteHandler')) {
 
     /**
      * KPT Router Route Handler Trait

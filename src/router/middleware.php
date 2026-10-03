@@ -12,7 +12,7 @@
 namespace KPT;
 
 // make sure it doesn't already exist
-if (! trait_exists('RouterMiddlewareHandler')) {
+if (! trait_exists('\KPT\RouterMiddlewareHandler')) {
 
     /**
      * KPT Router - Middleware Handling Trait
