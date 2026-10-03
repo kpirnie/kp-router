@@ -78,14 +78,14 @@ if (! trait_exists('RouterRequestProcessor')) {
                 self::$currentMethod = $this->getRequestMethod();
                 self::$currentPath = $this->getRequestUri();
 
-                // execute middlewares first
-                if ($this->executeMiddlewares($this->middlewares) === false) {
-                    return;
-                }
-
-                // apply rate limiting if enabled
+                // apply rate limiting first if enabled
                 if ($this->rateLimitingEnabled) {
                     $this->applyRateLimiting();
+                }
+
+                // execute middlewares
+                if ($this->executeMiddlewares($this->middlewares) === false) {
+                    return;
                 }
 
                 // find matching route handler

@@ -192,7 +192,7 @@ if (! trait_exists('RouterRateLimiter')) {
             }
 
             // get client ip and create cache key
-            $clientIp = self::getUserIp();
+            $clientIp = Router::getUserIp();
             $cacheKey = 'rate_limit_' . md5($clientIp);
 
             // get rate limit configuration
