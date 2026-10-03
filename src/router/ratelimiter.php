@@ -223,6 +223,10 @@ if (! trait_exists('RouterRateLimiter')) {
 
                 // whoopsie... handle rate limiting errors
             } catch (\Exception $e) {
+                // let the rate limit exceeded exception through
+                if ($e->getCode() === 429) {
+                    throw $e;
+                }
                 Logger::error('Rate limiting error', ['error' => $e->getMessage()]);
 
                 // check if strict mode is enabled

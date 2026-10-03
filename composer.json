@@ -18,7 +18,7 @@
         "controllers",
         "caching"
     ],
-    "homepage": "https://github.com/kpirnie/kpt-router",
+    "homepage": "https://github.com/kpirnie/kp-router",
     "license": "MIT",
     "funding": [
         {
@@ -78,8 +78,8 @@
         ]
     },
     "support": {
-        "issues": "https://github.com/kpirnie/kpt-router/issues",
-        "source": "https://github.com/kpirnie/kpt-router",
-        "docs": "https://github.com/kpirnie/kpt-router/blob/main/README.md"
+        "issues": "https://github.com/kpirnie/kp-router/issues",
+        "source": "https://github.com/kpirnie/kp-router",
+        "docs": "https://github.com/kpirnie/kp-router/blob/main/README.md"
     }
 }
